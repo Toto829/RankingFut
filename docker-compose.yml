@@ -1,0 +1,39 @@
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - web_a
+      - web_b
+      - api
+
+  web_a:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  web_b:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    env_file:
+      - .env
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
