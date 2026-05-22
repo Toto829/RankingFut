@@ -84,22 +84,6 @@ function App() {
                 <h2 className="h5 mb-3">Agregar persona a lista</h2>
                 <form className="row g-3" onSubmit={handleAddSubmit}>
                   <div className="col-12">
-                    <label htmlFor="addRanking" className="form-label fw-semibold">
-                      Ranking
-                    </label>
-                    <select
-                      id="addRanking"
-                      name="ranking"
-                      className="form-select"
-                      value={addForm.ranking}
-                      onChange={handleAddChange}
-                    >
-                      <option value="autism">Autismo</option>
-                      <option value="alcohol">Alcoholismo</option>
-                      <option value="fouls">Faltas</option>
-                    </select>
-                  </div>
-                  <div className="col-12">
                     <label htmlFor="addName" className="form-label fw-semibold">
                       Nombre
                     </label>
@@ -108,39 +92,6 @@ function App() {
                       name="name"
                       className="form-control"
                       value={addForm.name}
-                      onChange={handleAddChange}
-                      required
-                    />
-                  </div>
-                  {addForm.ranking === 'fouls' ? (
-                    <div className="col-12">
-                      <label htmlFor="addCardType" className="form-label fw-semibold">
-                        Tipo de tarjeta
-                      </label>
-                      <select
-                        id="addCardType"
-                        name="cardType"
-                        className="form-select"
-                        value={addForm.cardType}
-                        onChange={handleAddChange}
-                      >
-                        <option value="yellow">Amarilla</option>
-                        <option value="red">Roja</option>
-                        <option value="black">Negra</option>
-                      </select>
-                    </div>
-                  ) : null}
-                  <div className="col-12">
-                    <label htmlFor="addValue" className="form-label fw-semibold">
-                      {addForm.ranking === 'fouls' ? 'Cantidad de tarjetas' : 'Puntaje inicial'}
-                    </label>
-                    <input
-                      id="addValue"
-                      name="value"
-                      type="number"
-                      min="1"
-                      className="form-control"
-                      value={addForm.value}
                       onChange={handleAddChange}
                       required
                     />
@@ -338,10 +289,9 @@ function App() {
           emptyText="No hay personas con faltas registradas."
           columns={[
             { key: 'name', label: 'Persona' },
-            { key: 'yellowCards', label: `Tarjetas ${cardLabels.yellow}` },
-            { key: 'redCards', label: `Tarjetas ${cardLabels.red}` },
             { key: 'blackCards', label: `Tarjetas ${cardLabels.black}` },
-            { key: 'totalCards', label: 'Total tarjetas' },
+            { key: 'redCards', label: `Tarjetas ${cardLabels.red}` },
+            { key: 'yellowCards', label: `Tarjetas ${cardLabels.yellow}` },
           ]}
         />
       ) : null}

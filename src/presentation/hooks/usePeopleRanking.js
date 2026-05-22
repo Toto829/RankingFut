@@ -3,10 +3,7 @@ import { createPerson, listPeople, updatePerson } from '../../application/servic
 import { computeCards, initialPeople } from '../../domain/entities/person'
 
 const defaultAddForm = {
-  ranking: 'autism',
   name: '',
-  value: 0,
-  cardType: 'yellow',
 }
 
 const defaultUpdateForm = {
@@ -44,7 +41,7 @@ const withComputedCards = (people) =>
 const compareByFieldDesc = (field) => (a, b) => Number(b[field]) - Number(a[field])
 
 const getRankingRows = (people, ranking, includeZero = false) => {
-  const field = rankingFieldMap[ranking]
+  const field = ranking === 'fouls' ? 'totalCards' : rankingFieldMap[ranking]
 
   return [...people]
     .filter((person) => (includeZero ? true : Number(person[field]) > 0))
@@ -113,7 +110,7 @@ export const usePeopleRanking = () => {
     const { name, value } = event.target
     setAddForm((previous) => ({
       ...previous,
-      [name]: name === 'name' || name === 'ranking' || name === 'cardType' ? value : Number(value),
+      [name]: value,
     }))
   }
 
@@ -143,51 +140,24 @@ export const usePeopleRanking = () => {
       return
     }
 
-    if (Number(addForm.value) <= 0) {
-      setMessage('Ingresá un valor mayor a 0.')
-      return
-    }
-
     const existing = findByName(people, name)
-    const field = rankingFieldMap[addForm.ranking]
 
     if (existing) {
-      const payload = {
-        [field]:
-          addForm.ranking === 'fouls'
-            ? Number(existing.yellowCards) + getYellowCardsAmount(addForm.value, addForm.cardType)
-            : Number(existing[field]) + Number(addForm.value),
-      }
-
-      try {
-        const updated = await updatePerson(existing.id, payload)
-        setPeople((previous) => replacePersonInList(previous, updated))
-        setMessage('Persona agregada a la lista correctamente.')
-      } catch {
-        setPeople((previous) =>
-          replacePersonInList(previous, {
-            ...existing,
-            ...payload,
-          }),
-        )
-        setMessage('Sin conexión a BD: se actualizó localmente.')
-      }
-
-      setAddForm(defaultAddForm)
+      setMessage('La persona ya existe. Usá la sección de suma para cargar puntos o tarjetas.')
       return
     }
 
     const payload = {
       name,
-      autismPoints: addForm.ranking === 'autism' ? Number(addForm.value) : 0,
-      alcoholPoints: addForm.ranking === 'alcohol' ? Number(addForm.value) : 0,
-      yellowCards: addForm.ranking === 'fouls' ? getYellowCardsAmount(addForm.value, addForm.cardType) : 0,
+      autismPoints: 0,
+      alcoholPoints: 0,
+      yellowCards: 0,
     }
 
     try {
       const saved = await createPerson(payload)
       setPeople((previous) => [...previous, saved])
-      setMessage('Persona creada correctamente.')
+      setMessage('Persona agregada correctamente.')
     } catch {
       setPeople((previous) => [...previous, { id: Date.now(), ...payload }])
       setMessage('Sin conexión a BD: se guardó localmente para visualización.')
