@@ -5,6 +5,9 @@
   --rf-muted: #2e6488;
   --rf-primary: #0d6efd;
   --rf-focus: #79b7ff;
+  --rf-top-1: #f2d66d;
+  --rf-top-2: #d8dde5;
+  --rf-top-3: #c38d65;
 }
 
 body {
@@ -29,21 +32,37 @@ body {
 }
 
 .form-control,
+.form-select,
 .btn,
 .list-group-item {
   border-radius: 0.6rem;
 }
 
+.nav-pills .nav-link {
+  border: 1px solid #9dceff;
+  color: #0b4b7d;
+  font-weight: 600;
+  background: #f4faff;
+}
+
+.nav-pills .nav-link.active {
+  background: var(--rf-primary);
+  border-color: var(--rf-primary);
+}
+
 .form-control:focus,
+.form-select:focus,
 .btn:focus-visible,
 .list-group-item:focus-visible,
-a:focus-visible {
+a:focus-visible,
+.nav-link:focus-visible {
   outline: 3px solid var(--rf-focus);
   outline-offset: 2px;
   box-shadow: none;
 }
 
-.list-group-item {
+.list-group-item,
+.table {
   color: var(--rf-text);
 }
 
@@ -51,4 +70,16 @@ a:focus-visible {
   background-color: #d9efff;
   color: #003a66;
   border-color: #8ec7f5;
+}
+
+.top-1 {
+  background: color-mix(in srgb, var(--rf-top-1) 55%, white);
+}
+
+.top-2 {
+  background: color-mix(in srgb, var(--rf-top-2) 65%, white);
+}
+
+.top-3 {
+  background: color-mix(in srgb, var(--rf-top-3) 45%, white);
 }
