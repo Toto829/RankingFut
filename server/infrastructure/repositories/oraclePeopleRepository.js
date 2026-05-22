@@ -10,6 +10,32 @@ const getConnection = async () =>
     connectString: serverConfig.oracle.connectionString,
   })
 
+const mapRow = (row) => ({
+  id: row.id,
+  name: row.name,
+  autismPoints: row.autismPoints,
+  alcoholPoints: row.alcoholPoints,
+  yellowCards: row.yellowCards,
+})
+
+const findPersonById = async (connection, personId) => {
+  const result = await connection.execute(
+    `
+      SELECT
+        ID AS "id",
+        NAME AS "name",
+        AUTISM_POINTS AS "autismPoints",
+        ALCOHOL_POINTS AS "alcoholPoints",
+        YELLOW_CARDS AS "yellowCards"
+      FROM PEOPLE_RANKING
+      WHERE ID = :id
+    `,
+    { id: personId },
+  )
+
+  return result.rows?.[0] ?? null
+}
+
 export const createOraclePeopleRepository = () => ({
   async init() {
     const connection = await getConnection()
@@ -84,6 +110,55 @@ export const createOraclePeopleRepository = () => ({
         alcoholPoints,
         yellowCards,
       }
+    } finally {
+      await connection.close()
+    }
+  },
+
+  async updatePerson(personId, payload) {
+    const connection = await getConnection()
+
+    try {
+      const result = await connection.execute(
+        `
+          UPDATE PEOPLE_RANKING
+          SET
+            NAME = COALESCE(:name, NAME),
+            AUTISM_POINTS = COALESCE(:autismPoints, AUTISM_POINTS),
+            ALCOHOL_POINTS = COALESCE(:alcoholPoints, ALCOHOL_POINTS),
+            YELLOW_CARDS = COALESCE(:yellowCards, YELLOW_CARDS)
+          WHERE ID = :id
+        `,
+        {
+          id: personId,
+          name: Object.hasOwn(payload, 'name') ? payload.name : null,
+          autismPoints: Object.hasOwn(payload, 'autismPoints') ? payload.autismPoints : null,
+          alcoholPoints: Object.hasOwn(payload, 'alcoholPoints') ? payload.alcoholPoints : null,
+          yellowCards: Object.hasOwn(payload, 'yellowCards') ? payload.yellowCards : null,
+        },
+      )
+
+      if ((result.rowsAffected ?? 0) === 0) {
+        return null
+      }
+
+      const row = await findPersonById(connection, personId)
+      await connection.commit()
+
+      return row ? mapRow(row) : null
+    } finally {
+      await connection.close()
+    }
+  },
+
+  async deletePerson(personId) {
+    const connection = await getConnection()
+
+    try {
+      const result = await connection.execute('DELETE FROM PEOPLE_RANKING WHERE ID = :id', { id: personId })
+      await connection.commit()
+
+      return (result.rowsAffected ?? 0) > 0
     } finally {
       await connection.close()
     }

@@ -5,6 +5,8 @@ export const createPeopleRoutes = ({ peopleController }) => {
 
   router.get('/people', peopleController.listPeople)
   router.post('/people', peopleController.createPerson)
+  router.patch('/people/:id', peopleController.updatePerson)
+  router.delete('/people/:id', peopleController.deletePerson)
 
   return router
 }
